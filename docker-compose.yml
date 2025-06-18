@@ -1,0 +1,50 @@
+version: '3.0'
+services:
+  attendance-be:
+    build:
+      context: .
+      dockerfile: Dockerfile.go.1.23
+    working_dir: /home/golang/src
+    container_name: attendance-be
+    depends_on:
+      - attendance-postgresql
+    volumes:
+      - ~/.ssh:/root/.ssh
+      - ./:/home/golang/src
+    ports:
+      - 8081:80
+    networks:
+      - attendance-network
+    tty: true
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    # command: make run-all
+  attendance-postgresql:
+    image: bitnami/postgresql:13
+    container_name: 'attendance-postgresql'
+    environment:
+      - POSTGRESQL_USERNAME=attendanceuser
+      - POSTGRESQL_PASSWORD=attendancepassword
+      - POSTGRESQL_DATABASE=attendance_db
+    ports:
+      - 5432:5432
+    volumes:
+      - attendance-postgresql-vol:/bitnami/postgresql
+    networks:
+      - attendance-network
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+volumes:
+  attendance-postgresql-vol:
+    driver: local
+
+networks:
+  attendance-network:
+    driver: bridge
