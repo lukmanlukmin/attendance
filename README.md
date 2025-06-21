@@ -67,6 +67,24 @@ loan-service/
 
 ---
 
+## 🐳 Dockerized Setup
+
+This project is **preconfigured** in both `docker-compose.yml` and `config.yaml`.
+
+You **don't need to modify** the config files to run the project locally — all service URLs, ports, database DSNs, and Kafka settings are already aligned.
+
+To run the full stack:
+
+```bash
+docker-compose up --build
+```
+
+📌 *Note:*  
+All environment-specific values are managed inside `config.yaml`, which is already tailored to work out of the box with the `docker-compose.yml`.  
+Just clone, build, and run — no manual config required.
+
+---
+
 ## ⚙️ Makefile Commands
 
 This project includes a `Makefile` for simplified development. Key commands include:
