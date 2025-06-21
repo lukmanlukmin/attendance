@@ -1,0 +1,280 @@
+definitions:
+  payload.LoginCredential:
+    properties:
+      password:
+        example: password1
+        type: string
+      username:
+        example: user1
+        type: string
+    required:
+    - password
+    - username
+    type: object
+  payload.PayslipDetailResponse:
+    properties:
+      attendance_days:
+        type: integer
+      attendance_deduction:
+        type: integer
+      attendance_off_days:
+        type: integer
+      base_salary:
+        type: integer
+      employee_id:
+        type: string
+      id:
+        type: string
+      overtime_hours:
+        type: integer
+      overtime_multiply_rate:
+        type: number
+      overtime_pay:
+        type: integer
+      reimbursement_total:
+        type: integer
+      reimbursements:
+        items:
+          $ref: '#/definitions/payload.ReimbursementBreakdown'
+        type: array
+      take_home_pay:
+        type: integer
+    type: object
+  payload.PayslipSummaryItem:
+    properties:
+      employee_id:
+        type: string
+      employee_name:
+        type: string
+      take_home_pay:
+        type: integer
+    type: object
+  payload.PayslipSummaryResponse:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/payload.PayslipSummaryItem'
+        type: array
+      page:
+        type: integer
+      per_page:
+        type: integer
+      total_data:
+        type: integer
+      total_take_home:
+        type: integer
+    type: object
+  payload.ReimbursementBreakdown:
+    properties:
+      amount:
+        type: integer
+      description:
+        type: string
+    type: object
+  payload.Token:
+    properties:
+      refresh_token:
+        type: string
+      token:
+        type: string
+    type: object
+info:
+  contact: {}
+  description: Attendance API Documentation
+  title: Attendance API
+  version: 1.0.0-Beta
+paths:
+  /v1/attendances:
+    post:
+      consumes:
+      - application/json
+      description: Submit Attendance
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+        "500":
+          description: Internal Server Error
+      security:
+      - BearerAuth: []
+      summary: Submit Attendance
+      tags:
+      - Attendance
+  /v1/attendances/overtime:
+    post:
+      consumes:
+      - application/json
+      description: Request Overtime
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+        "500":
+          description: Internal Server Error
+      security:
+      - BearerAuth: []
+      summary: Request Overtime
+      tags:
+      - Attendance
+  /v1/attendances/period:
+    post:
+      consumes:
+      - application/json
+      description: Create Attendance Period
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+        "500":
+          description: Internal Server Error
+      security:
+      - BearerAuth: []
+      summary: Create Attendance Period
+      tags:
+      - Attendance
+  /v1/authorize/login:
+    post:
+      consumes:
+      - application/json
+      description: Login
+      parameters:
+      - description: User Credential Payload
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/payload.LoginCredential'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/payload.Token'
+      summary: Login
+      tags:
+      - auth
+  /v1/payrolls/{id}/payslip:
+    get:
+      consumes:
+      - application/json
+      description: Get Payslip Detail
+      parameters:
+      - description: period ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/payload.PayslipDetailResponse'
+        "400":
+          description: Bad Request
+        "500":
+          description: Internal Server Error
+      security:
+      - BearerAuth: []
+      summary: Get Payslip Detail
+      tags:
+      - Payroll
+  /v1/payrolls/{id}/payslips:
+    get:
+      consumes:
+      - application/json
+      description: Get Payslip Summary
+      parameters:
+      - description: payroll ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: page number
+        in: query
+        name: page
+        type: integer
+      - description: per page
+        in: query
+        name: per_page
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/payload.PayslipSummaryResponse'
+        "400":
+          description: Bad Request
+        "500":
+          description: Internal Server Error
+      security:
+      - BearerAuth: []
+      summary: Get Payslip Summary
+      tags:
+      - Payroll
+  /v1/payrolls/overtime:
+    post:
+      consumes:
+      - application/json
+      description: Submit Reimburse
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+        "500":
+          description: Internal Server Error
+      security:
+      - BearerAuth: []
+      summary: Submit Reimburse
+      tags:
+      - Payroll
+  /v1/payrolls/period/{id}:
+    post:
+      consumes:
+      - application/json
+      description: Create Payroll
+      parameters:
+      - description: period ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+        "500":
+          description: Internal Server Error
+      security:
+      - BearerAuth: []
+      summary: Create Payroll
+      tags:
+      - Payroll
+schemes:
+- http
+- https
+securityDefinitions:
+  BearerAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

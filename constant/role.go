@@ -1,0 +1,9 @@
+// Package constant ...
+package constant
+
+const (
+	// RoleAdmin ...
+	RoleAdmin = "admin"
+	// RoleEmployee ...
+	RoleEmployee = "employee"
+)

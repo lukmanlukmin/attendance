@@ -1,0 +1,50 @@
+Server:
+  HttpPort: ":80"
+
+Security:
+  JWTSecret: "some-random-string"
+  JWTDuration: "24h"
+
+PostgresDBConfig:
+  DSN: "host=attendance-postgresql port=5432 user=attendanceuser password=attendancepassword dbname=attendance_db sslmode=disable"
+  RetryInterval: 10
+  MaxIdleConn: 10
+  MaxConn: 10
+
+KafkaConfig:
+  brokers: ["attendance-kafka:9092"] # if multiple broker host use comma for separator, example: ["host1:9092","host2:9092"]
+  version: "2.2.0" # kafka version
+  client_id: "attendance-core-backend" # free to change with your own
+  channel_buffer_size: 256 # how many message in channel. default 256
+  tls:
+    enable: false
+    ca_file: ""
+    cert_file: ""
+    key_file: ""
+    skip_verify: true
+  sasl:
+    enable: false
+    mechanism: "PLAIN"
+    user: ""
+    password: ""
+    version: 1 # version available : 0, 1
+    handshake: true
+  producer:
+    timeout_second: 5 # in second
+    require_ack: -1 # -1 wait for all, 0 = NoResponse doesn't send any response, the TCP ACK is all you get, 1 = WaitForLocal waits for only the local commit to succeed before responding
+    idem_potent: true # If enabled, the producer will ensure that exactly one copy of each message is written
+    partition_strategy: "hash" # available strategy : hash, roundrobin, manual, random, reference
+  consumer:
+    rebalance_strategy: "range" # range, sticky, roundrobin, all of strategy only use for consumer group
+    session_timeout_second: 8 # timeout for consumer group
+    heartbeat_interval: 1000
+    offset_initial: -2 # The initial offset to use if no offset was previously committed. Should be -1 = newest or  -2 = oldest
+    auto_commit: true
+    isolation_level: 1 # `0 = ReadUncommitted` (default) to consume and return all messages in message channel, 1 = ReadCommitted` to hide messages that are part of an aborted transaction
+
+Application:
+  AllowOverLapPeriod: false
+  StartWOrkingHour: 0
+  EndWorkingHour: 1
+  MaxOvertimeHour: 3
+  MultiplyOvertimeRate: 2
