@@ -21,7 +21,7 @@ services:
       options:
         max-size: "10m"
         max-file: "3"
-    # command: make run-all
+    command: make run-all
   attendance-postgresql:
     image: bitnami/postgresql:13
     container_name: 'attendance-postgresql'
@@ -40,6 +40,66 @@ services:
       options:
         max-size: "10m"
         max-file: "3"
+  
+  attendance-zookeeper:
+    image: confluentinc/cp-zookeeper:7.6.0
+    container_name: attendance-zookeeper
+    ports:
+      - "2181:2181"
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    networks:
+      - attendance-network
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    restart: unless-stopped
+
+  attendance-kafka:
+    image: confluentinc/cp-kafka:7.6.0
+    container_name: attendance-kafka
+    depends_on:
+      - attendance-zookeeper
+    ports:
+      - "9092:9092"
+      - "29092:29092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: attendance-zookeeper:2181
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://attendance-kafka:9092,PLAINTEXT_HOST://localhost:29092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_UNCLEAN_LEADER_ELECTION_ENABLE: "true"
+    networks:
+      - attendance-network
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    restart: unless-stopped
+
+  attendance-kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    container_name: attendance-kafka-ui
+    depends_on:
+      - attendance-kafka
+    ports:
+      - "8082:8080"
+    environment:
+      - KAFKA_CLUSTERS_0_NAME=local
+      - KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS=attendance-kafka:9092
+    networks:
+      - attendance-network
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    restart: unless-stopped
 
 volumes:
   attendance-postgresql-vol:
